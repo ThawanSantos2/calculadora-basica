@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Básica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex flex-col items-center justify-between min-h-screen">
+
+    <h1 class="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mt-6">
+        Calculadora Básica
+    </h1>
+    
+    <!-- Calculadora -->
+    <div class="mt-10 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg max-w-xs w-full">
+        <div id="display" class="bg-gray-100 dark:bg-gray-700 text-right p-4 rounded-md text-2xl font-mono mb-4 h-16 flex items-center overflow-auto">
+            0
+        </div>
+        <div class="grid grid-cols-4 gap-3">
+            <button class="btn bg-gray-200 dark:bg-gray-600">7</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">8</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">9</button>
+            <button class="btn bg-red-500 text-white">C</button>
+
+            <button class="btn bg-gray-200 dark:bg-gray-600">4</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">5</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">6</button>
+            <button class="btn bg-blue-500 text-white">/</button>
+
+            <button class="btn bg-gray-200 dark:bg-gray-600">1</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">2</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">3</button>
+            <button class="btn bg-blue-500 text-white">*</button>
+
+            <button class="btn bg-gray-200 dark:bg-gray-600">0</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">.</button>
+            <button class="btn bg-green-500 text-white">=</button>
+            <button class="btn bg-blue-500 text-white">-</button>
+
+            <button class="btn bg-blue-500 text-white">+</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">%</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">(</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">)</button>
+
+            <button class="btn bg-gray-200 dark:bg-gray-600">[</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">]</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">{</button>
+            <button class="btn bg-gray-200 dark:bg-gray-600">}</button>
+
+            <!-- <button class="btn col-span-4 bg-purple-500 text-white">x!</button> -->
+        </div>
+    </div>
+
+    <!-- Alternância de tema
+    <button id="toggle-theme" class="mt-6 p-2 bg-gray-200 dark:bg-gray-700 rounded-lg shadow-md">Alternar Tema</button> -->
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-gray-200 dark:bg-gray-700 w-full py-4 text-center text-sm">
+        Desenvolvido por Thawan Bomfim dos Santos - 2025
+    </footer>
+
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.querySelectorAll('.btn');
+        const toggleTheme = document.getElementById('toggle-theme');
+
+        let currentValue = "";
+
+        // Função para reproduzir som
+        const playSound = () => {
+            const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+            audio.play();
+        };
+
+        // Função para calcular fatorial
+        const factorial = (n) => {
+            if (n < 0) return NaN; // Fatorial de número negativo não existe
+            if (n === 0 || n === 1) return 1;
+            return n * factorial(n - 1);
+        };
+
+        // Função para avaliar expressões complexas
+        const evaluateExpression = (expr) => {
+            // Substituir fatorial (!) por valores calculados
+            expr = expr.replace(/(\d+)!/g, (match, num) => factorial(parseInt(num)));
+
+            // Substituir colchetes e chaves por parênteses para avaliação
+            expr = expr.replace(/\[/g, '(').replace(/\]/g, ')');
+            expr = expr.replace(/\{/g, '(').replace(/\}/g, ')');
+
+            try {
+                return eval(expr);
+            } catch (e) {
+                return 'Erro';
+            }
+        };
+
+        // Clique nos botões
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                playSound();
+                const value = button.textContent;
+
+                if (value === 'C') {
+                    currentValue = "";
+                    display.textContent = 0;
+                } else if (value === '=') {
+                    currentValue = evaluateExpression(currentValue).toString();
+                    display.textContent = currentValue;
+                } else {
+                    currentValue += value;
+                    display.textContent = currentValue;
+                }
+            });
+        });
+
+        // Alternância de tema claro/escuro
+        toggleTheme.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Carregar tema do sistema operacional ou tema salvo
+        window.addEventListener('DOMContentLoaded', () => {
+            const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedTheme = localStorage.getItem('theme');
+
+            if (savedTheme) {
+                document.body.classList.add(savedTheme);
+            } else if (userPrefersDark) {
+                document.body.classList.add('dark');
+            }
+        });
+    </script>
+</body>
+</html>
